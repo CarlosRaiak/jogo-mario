@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Mario Jump</title>
+<style>
+    * {  
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #87CEEB;
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    .game-board {
+        width: 100%;
+        height: 70vh;
+        border-bottom: 15px solid green;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        background: skyblue;
+    }
+
+    /* Nuvens */
+    .cloud {
+        position: absolute;
+        top: 30px;
+        width: 150px;
+        animation: cloud-animation 22s linear infinite;
+        opacity: 0.8;
+    }
+    .cloud2 {
+        position: absolute;
+        top: 120px;
+        width: 200px;
+        animation: cloud-animation 28s linear infinite;
+        opacity: 0.7;
+    }
+    .cloud3 {
+        position: absolute;
+        top: 200px;
+        width: 180px;
+        animation: cloud-animation 35s linear infinite;
+        opacity: 0.6;
+    }
+
+    @keyframes cloud-animation {
+        from { right: -200px; }
+        to { right: 100%; }
+    }
+
+    .pipe {
+        position: absolute;
+        bottom: 0;
+        width: 80px;
+        animation: pipe-animation 2s infinite linear;
+    }
+
+    .mario {
+        width: 120px;
+        position: absolute;
+        bottom: 0;
+    }
+
+    .jump {
+        animation: jump 500ms ease-out;
+    }
+
+    @keyframes pipe-animation {
+        from { right: -80px; }
+        to { right: 100%; }
+    }
+
+    @keyframes jump {
+        0%   { bottom: 0; }
+        40%  { bottom: 160px; }
+        50%  { bottom: 160px; }
+        60%  { bottom: 160px; }
+        100% { bottom: 0; }
+    }
+
+    /* Botão Reset */
+    #resetBtn {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: red;
+        color: white;
+        font-size: 20px;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        z-index: 100;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+    #resetBtn:active {
+        background: darkred;
+    }
+</style>
+</head>
+<body>
+    <div class="game-board">
+        <!-- Nuvens -->
+        
+        <img src="clouds (1).png" class="cloud3">
+        <img src="gato.gif" class="cloud">
+
+        <!-- Mario e cano -->
+        <img src="mario.gif" class="mario" id="mario">
+        <img src="pipe.png" class="pipe" id="pipe">
+    </div>
+
+    <!-- Botão Reset -->
+    <button id="resetBtn">🔄 Resetar</button>
+
+<script>
+    const mario = document.getElementById('mario');
+    const pipe = document.getElementById('pipe');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let gameOver = false;
+
+    const jump = () => {
+        if (!mario.classList.contains('jump') && !gameOver) {
+            mario.classList.add('jump');
+            setTimeout(() => {
+                mario.classList.remove('jump');
+            }, 500);
+        }
+    };
+
+    // Pular ao tocar, clicar ou pressionar tecla
+    document.addEventListener('touchstart', jump);
+    document.addEventListener('mousedown', jump);
+    document.addEventListener('keydown', jump);
+
+    resetBtn.addEventListener('click', () => { location.reload(); });
+
+    const loop = setInterval(() => {
+        const pipePosition = pipe.offsetLeft;
+        const marioPosition = +window.getComputedStyle(mario).bottom.replace('px', '');
+
+        if (pipePosition <= 100 && pipePosition > 0 && marioPosition < 80 && !gameOver) {
+            gameOver = true;
+
+            // Para o cano mas mantém visível
+            pipe.style.animation = 'none';
+            pipe.style.left = `${pipePosition}px`;
+
+            // Mario troca para imagem game-over
+            mario.style.animation = 'none';
+            mario.style.bottom = `${marioPosition}px`;
+            mario.src = 'game-over.png';
+            mario.style.width = '80px';
+            mario.style.marginLeft = '50px';
+
+            // Mostrar botão reset
+            resetBtn.style.display = 'block';
+
+            clearInterval(loop);
+        }
+    }, 10);
+</script>
+</body>
+</html>
